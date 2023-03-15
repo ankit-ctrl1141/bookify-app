@@ -8,8 +8,11 @@ import { getAuth,
          onAuthStateChanged,
          signOut
 } from "firebase/auth";
-const FirebaseContext = createContext(null);
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 
+
+const FirebaseContext = createContext(null);
 
 const firebaseConfig = {
     apiKey: "AIzaSyCy_TarR4NrWyu3nfugkc7GoCj2_DTQOuY",
@@ -26,7 +29,11 @@ export const useFirebase =  () => useContext(FirebaseContext);
 
 const firebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(firebaseApp);
+const firestore = getFirestore(firebaseApp);
+const storage = getStorage(firebaseApp);
+
 const googleProvider = new GoogleAuthProvider();
+
 
 
 export const FirebaseProvider = (props) =>{
@@ -45,18 +52,40 @@ export const FirebaseProvider = (props) =>{
         });
     },[]);
     
+    // console.log(user);
+
     const signupUserWithEmailAndPassword = (email, password) => 
         createUserWithEmailAndPassword(firebaseAuth,email,password);
 
     const signInWithEmailAndPass = (email, password)=> signInWithEmailAndPassword(firebaseAuth ,email, password); 
 
-    const signInWithGoogle = ()=> signInWithPopup(firebaseAuth, googleProvider)
+    const signInWithGoogle = ()=> signInWithPopup(firebaseAuth, googleProvider);
+
+    const handleCreateNewListing = async (name, isbn, price, cover) => {
+         const imageRef = ref(storage, `uploads/images/${Date.now()}-${cover.name}`);
+         const uploadResult = await uploadBytes( imageRef, cover); // path where image is uploaded
+         // image has been uploaded, now to keep this in FireStore.
+         
+         return await addDoc(collection(firestore, "books"), {
+            // on console.log(user), we can see all these.
+            name,
+            isbn,
+            price,
+            imageURL: uploadResult.ref.fullPath,
+            userID: user.uid,
+            userEmail: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL
+         })
+
+
+    };
     
     const isLoggedIn = user ? true : false;
 
     const logOutUser = () => signOut(firebaseAuth);
 
-    return <FirebaseContext.Provider value={{ signupUserWithEmailAndPassword, signInWithEmailAndPass, signInWithGoogle, isLoggedIn, logOutUser }}>
+    return <FirebaseContext.Provider value={{ signupUserWithEmailAndPassword, signInWithEmailAndPass, signInWithGoogle, handleCreateNewListing, isLoggedIn, logOutUser }}>
         { props.children }
     </FirebaseContext.Provider>
 }

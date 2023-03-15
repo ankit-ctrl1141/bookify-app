@@ -16,6 +16,7 @@ const ListingPage = () => {
     const onSubmitHandler = async (e) => {
           e.preventDefault();
           await firebase.handleCreateNewListing(bookName, isbnNumber, price, coverPic);
+          alert("Submitted Successfully...")
     }
 
     return <div className="container mt-5">

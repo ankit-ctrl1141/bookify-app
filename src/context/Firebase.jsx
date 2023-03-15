@@ -8,8 +8,8 @@ import { getAuth,
          onAuthStateChanged,
          signOut
 } from "firebase/auth";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 
 const FirebaseContext = createContext(null);
@@ -81,11 +81,23 @@ export const FirebaseProvider = (props) =>{
 
     };
     
+    // retriving data
+
+    const listAllBooks = ()=>{
+        return getDocs(collection(firestore, "books"));
+    };
+
+    // to retrive image
+
+    const getImageURL = (path) =>{
+         return getDownloadURL(ref(storage, path));
+    }
+
     const isLoggedIn = user ? true : false;
 
     const logOutUser = () => signOut(firebaseAuth);
 
-    return <FirebaseContext.Provider value={{ signupUserWithEmailAndPassword, signInWithEmailAndPass, signInWithGoogle, handleCreateNewListing, isLoggedIn, logOutUser }}>
+    return <FirebaseContext.Provider value={{ signupUserWithEmailAndPassword, signInWithEmailAndPass, signInWithGoogle, handleCreateNewListing, isLoggedIn, logOutUser, listAllBooks, getImageURL}}>
         { props.children }
     </FirebaseContext.Provider>
 }

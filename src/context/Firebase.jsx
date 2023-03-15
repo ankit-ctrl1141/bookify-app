@@ -1,6 +1,13 @@
-import { createContext , useContext} from "react";
+import { createContext , useContext, useEffect, useState} from "react";
 import { initializeApp } from "firebase/app"
-
+import { getAuth, 
+         createUserWithEmailAndPassword, 
+         signInWithEmailAndPassword,
+         GoogleAuthProvider,
+         signInWithPopup,
+         onAuthStateChanged,
+         signOut
+} from "firebase/auth";
 const FirebaseContext = createContext(null);
 
 
@@ -18,9 +25,38 @@ const firebaseConfig = {
 export const useFirebase =  () => useContext(FirebaseContext);
 
 const firebaseApp = initializeApp(firebaseConfig);
+const firebaseAuth = getAuth(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
+
 
 export const FirebaseProvider = (props) =>{
-    return <FirebaseContext.Provider>
+    const [user, setUser] = useState(null);
+
+    // To check if user is already loggedIN or not
+
+    useEffect(()=>{
+        onAuthStateChanged(firebaseAuth, (user)=>{
+           if(user) {
+            setUser(user)
+           }
+           else{
+            setUser(null);
+           }
+        });
+    },[]);
+    
+    const signupUserWithEmailAndPassword = (email, password) => 
+        createUserWithEmailAndPassword(firebaseAuth,email,password);
+
+    const signInWithEmailAndPass = (email, password)=> signInWithEmailAndPassword(firebaseAuth ,email, password); 
+
+    const signInWithGoogle = ()=> signInWithPopup(firebaseAuth, googleProvider)
+    
+    const isLoggedIn = user ? true : false;
+
+    const logOutUser = () => signOut(firebaseAuth);
+
+    return <FirebaseContext.Provider value={{ signupUserWithEmailAndPassword, signInWithEmailAndPass, signInWithGoogle, isLoggedIn, logOutUser }}>
         { props.children }
     </FirebaseContext.Provider>
 }

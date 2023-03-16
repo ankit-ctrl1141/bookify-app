@@ -28,18 +28,26 @@ const BookDetailPage = () => {
     }, [data]);
 
     const placeOrder = async () => {
-         const result = await firebase.placeOrder(params.bookId, qty);
-        //  console.log("Order Placed", result);
-        if(result){
+         try{
+            await firebase.placeOrder(params.bookId, qty);
             alert("Order Placed Successfully...")
-        }
+         }catch(err){
+            alert("You are currently not Logged In. To place an Order you should LogIn/Register first.")
+         }
+     
+        // if(result){
+        //     alert("Order Placed Successfully...")
+        // }
     }
 
     if (data == null) {
-        return <h1>Loading...</h1>
+        return <div style={{display: "flex",  justifyContent: "center",color:"green"}}>
+            <h1>Loading...Please wait...</h1>
+        </div>
     }
 
-    // console.log(params);
+
+    
     return <div className="container mt-3 mb-5">
         <h2>{data.name}</h2>
         <img src={url} width="30%" style={{ borderRadius: "10px" }} />

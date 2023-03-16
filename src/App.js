@@ -11,6 +11,8 @@ import HomePage from "./pages/HomePage";
 import MyNavBar from "./components/MyNavBar";
 import ListingPage from "./pages/List";
 import BookDetailPage from "./pages/BookDetail";
+import ViewOrdersPage from "./pages/ViewOrder";
+import ViewOrderDetails from "./pages/ViewOrderDetail";
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/login" element={<LogIn/>}/>
           <Route path="/book/list" element={<ListingPage/>}/>
           <Route path="/book/view/:bookId" element={<BookDetailPage/>}/>
+          <Route path="/book/orders" element={<ViewOrdersPage/>}/>
+          <Route path="/books/order/:bookId" element={<ViewOrderDetails/>}/>
       </Routes>
     </div>
   );

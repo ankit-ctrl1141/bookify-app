@@ -1,7 +1,7 @@
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useFirebase } from "../context/Firebase"
 
 const Register = () => {
@@ -12,22 +12,24 @@ const Register = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    useEffect(()=>{
-        if(firebase.isLoggedIn){
+    useEffect(() => {
+        if (firebase.isLoggedIn) {
             // naviagte to home if user is already logged in
             navigate("/");
-            console.log("user is already logged in....");
+            // console.log("user is already logged in....");
         }
-    },[firebase,navigate]);
+    }, [firebase, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Signing Up...")
+        // console.log("Signing Up...")
         const result = await firebase.signupUserWithEmailAndPassword(email, password);
-        console.log("Successfully Signed Up", result);
+        // console.log("Successfully Signed Up", result);
     }
 
+  
     return <div className="container mt-5">
+        <h2 className='mb-3'>Register Page </h2>
         <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>Email address</Form.Label>
@@ -44,6 +46,17 @@ const Register = () => {
             <Button variant="primary" type="submit">
                 Create Account
             </Button>
+
+            <div className='mt-3'>
+                <Form.Text >
+                    <h6>Already have an Account. <Link to="/login" >Log In </Link></h6>
+                </Form.Text>
+            </div>
+            <h5 className="mt-3 mb-3"> OR </h5>
+            <div >
+                <Button onClick={firebase.signInWithGoogle} variant='danger'>SignUp with Google</Button>
+            </div>
+
         </Form>
     </div>
 }

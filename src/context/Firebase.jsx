@@ -9,7 +9,16 @@ import {
     onAuthStateChanged,
     signOut
 } from "firebase/auth";
-import { getFirestore, collection, addDoc, getDocs, doc, getDoc } from "firebase/firestore";
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    doc,
+    getDoc,
+    query, // to query the data
+    where // to match the conditions
+} from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 
@@ -46,6 +55,7 @@ export const FirebaseProvider = (props) => {
         onAuthStateChanged(firebaseAuth, (user) => {
             if (user) {
                 setUser(user)
+               
             }
             else {
                 setUser(null);
@@ -53,7 +63,7 @@ export const FirebaseProvider = (props) => {
         });
     }, []);
 
-    // console.log(user);
+    
 
     const signupUserWithEmailAndPassword = (email, password) =>
         createUserWithEmailAndPassword(firebaseAuth, email, password);
@@ -68,7 +78,7 @@ export const FirebaseProvider = (props) => {
         // image has been uploaded, now to keep this in FireStore.
 
         return await addDoc(collection(firestore, "books"), {
-            // on console.log(user), we can see all these.
+           
             name,
             isbn,
             price,
@@ -104,23 +114,44 @@ export const FirebaseProvider = (props) => {
     }
 
     // placed orders detail in collection
-    const placeOrder = async (bookId, qty) =>{
+    const placeOrder = async (bookId, qty) => {
         const collectionRef = collection(firestore, "books", bookId, "orders");
         const result = await addDoc(collectionRef, {
-            userID : user.uid,
-            userEmail : user.email,
-            displayName : user.displayName,
-            photoURL : user.photoURL,
-            qty : Number(qty)
+            userID: user.uid,
+            userEmail: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            qty: Number(qty)
         });
         return result;
     };
+
+
+    // fetch orders from db
+
+    const fetchMyBooks = async (userId) => {
+
+        const collectionRef = collection(firestore, "books");
+        const q = query(collectionRef, where("userID", "==", userId));
+
+        const result = await getDocs(q);
+        return result;
+    }
+
+
+    // To get order detail
+
+    const getOrders = async (bookId) => {
+        const collectionRef = collection(firestore, "books", bookId, "orders");
+        const result = await getDocs(collectionRef);
+        return result;
+    }
 
     const isLoggedIn = user ? true : false;
 
     const logOutUser = () => signOut(firebaseAuth);
 
-    return <FirebaseContext.Provider value={{ signupUserWithEmailAndPassword, signInWithEmailAndPass, signInWithGoogle, handleCreateNewListing, isLoggedIn, logOutUser, listAllBooks, getImageURL, getBookById, placeOrder }}>
+    return <FirebaseContext.Provider value={{ signupUserWithEmailAndPassword, signInWithEmailAndPass, signInWithGoogle, handleCreateNewListing, isLoggedIn, logOutUser, listAllBooks, getImageURL, getBookById, placeOrder, fetchMyBooks, user, getOrders }}>
         {props.children}
     </FirebaseContext.Provider>
 }

@@ -15,8 +15,12 @@ const ListingPage = () => {
 
     const onSubmitHandler = async (e) => {
           e.preventDefault();
-          await firebase.handleCreateNewListing(bookName, isbnNumber, price, coverPic);
+          try{
+            await firebase.handleCreateNewListing(bookName, isbnNumber, price, coverPic);
           alert("Submitted Successfully...")
+          }catch(err){
+            alert("You are not currently LogIn or Registered. To submit details of your book you should LogIn/Register first. ")
+          }
     }
 
     return <div className="container mt-5">

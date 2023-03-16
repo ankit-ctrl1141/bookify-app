@@ -10,6 +10,7 @@ import HomePage from "./pages/HomePage";
 // Components
 import MyNavBar from "./components/MyNavBar";
 import ListingPage from "./pages/List";
+import BookDetailPage from "./pages/BookDetail";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/register" element={<Register/>}/>
           <Route path="/login" element={<LogIn/>}/>
           <Route path="/book/list" element={<ListingPage/>}/>
+          <Route path="/book/view/:bookId" element={<BookDetailPage/>}/>
       </Routes>
     </div>
   );
